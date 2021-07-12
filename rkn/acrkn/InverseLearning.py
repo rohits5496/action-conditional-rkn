@@ -10,7 +10,7 @@ from torch.utils.tensorboard import SummaryWriter
 from rkn.acrkn.AcRknInv import AcRknInv
 from util.Losses import mse
 
-writer = SummaryWriter('/home/vshaj/CLAS/Logs/ALRhub/INV_jointspace-lam.1')
+writer = SummaryWriter('/home/i53/student/rohit_sonker/action-conditional-rkn/Logs/ALRhub/INV_jointspace-lam.1')
 
 optim = torch.optim
 nn = torch.nn

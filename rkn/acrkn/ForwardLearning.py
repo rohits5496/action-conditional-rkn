@@ -10,7 +10,7 @@ from torch.utils.tensorboard import SummaryWriter
 from rkn.acrkn.AcRKN import AcRKN
 from util.Losses import mse, gaussian_nll
 
-writer = SummaryWriter('/home/vshaj/CLAS/Logs/ALRhub/fwd_noinit5')
+writer = SummaryWriter('/home/rohit_sonker/action-conditional-rkn/Logs/ALRhub/fwd_noinit5')
 
 optim = torch.optim
 nn = torch.nn
@@ -32,7 +32,7 @@ class Learn:
         self._model = model
         self._learning_rate = self._model.c.learning_rate
         if save_path is None:
-            self._save_path = os.getcwd() + '/experiments/Franka/saved_models/model.torch'
+            self._save_path = os.getcwd() + '/experiments/Franka/saved_models/model2.torch' #changed
         else:
             self._save_path = save_path
 

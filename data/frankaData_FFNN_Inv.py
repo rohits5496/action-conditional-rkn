@@ -14,6 +14,8 @@ class boschRobot():
 
     def __init__(self, standardize=True, targets='current_state', dim=14):
         self.datapath = os.getcwd() + '/data/FrankaData/rubber_acce/without/'
+        # self.datapath = os.getcwd() + '/data/FrankaData/mujoco/'
+
         self.dim = dim
         self.downsample = 1
         self.standardize = standardize
@@ -39,6 +41,7 @@ class boschRobot():
     def _loop_data(self):
         firstFlag = True
         for f in os.listdir(self.datapath):
+            print(f)
             data_in, data_out = self._load_file(f)
             if firstFlag:
                 full_data_in = data_in
