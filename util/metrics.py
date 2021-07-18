@@ -36,6 +36,8 @@ def root_mean_squared(pred, target, data=[], tar='observations', fromStep=0, den
     sumSquare = np.sum(np.sum(np.sum((target - pred) ** 2)))
     return np.sqrt(sumSquare / numSamples)
 
+
+
 def joint_mse(pred, target, data=[], tar='observations', fromStep=0, denorma=False, plot=None):
     """
     :return: mse

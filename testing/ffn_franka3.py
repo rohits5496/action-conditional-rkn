@@ -14,10 +14,6 @@ import numpy as np
 
 from data.frankaData_Seq_Inv import frankaArmSeq
 from data.frankaData_FFNN_Inv import boschRobot
-# from rkn.acrkn.AcRknInv import AcRknInv
-# from rkn_cell.acrkn_cell import AcRKNCell
-# from rkn.acrkn.InverseLearning import Learn
-# from rkn.acrkn.InverseInference import Infer
 from util.ConfigDict import ConfigDict
 from util.metrics import naive_baseline, root_mean_squared
 from util.dataProcess import diffToAct
@@ -74,6 +70,13 @@ class FrankaFFNInv(nn.Module):
         super(FrankaFFNInv, self).__init__()
         self._device = torch.device("cuda" if torch.cuda.is_available() and use_cuda_if_available else "cpu")
         self._layers = self._buid_hidden_layers(input_size, given_layers, output_size)
+        # self._dropout = nn.Dropout(0.5)
+        # self._layers = nn.Sequential(
+        #     nn.Linear(input_size, 32),
+        #     nn.ReLU(),
+        #     nn.Linear(32, 7)
+        # )
+
         if save_path is None:
             self._save_path = os.getcwd() + '/experiments/Franka/saved_models/model.torch'
         else:
@@ -92,6 +95,7 @@ class FrankaFFNInv(nn.Module):
         # input_layer
         layers.append(nn.Linear(in_features=input_size, out_features=given_layers[0]))
         layers.append(nn.ReLU())
+        
         #hidden layers
         for i in range(0,len(given_layers)-1):
             layers.append(nn.Linear(in_features=given_layers[i], out_features=given_layers[i+1]))
@@ -102,35 +106,37 @@ class FrankaFFNInv(nn.Module):
 
         return nn.ModuleList(layers)
 
-    def forward(self, obs, next_obs):
+    def forward(self, obs, next_obs, acts):
 
-        h=torch.cat((obs, next_obs),1)
+        h=torch.cat((obs, next_obs, acts),1)
         for layer in self._layers:
             h = layer(h)
-
+            # h = self._dropout(x)
         return h
+        # return self._layers(h)
 
-def train_step(train_obs: np.ndarray, train_next_obs: np.ndarray, train_act_targets: np.ndarray,  batch_size: int, 
-                model, device, optimizer):
+def train_step(train_obs: np.ndarray, train_next_obs: np.ndarray, train_acts:np.ndarray, train_act_targets: np.ndarray,  batch_size: int):
                 
-    dataset = TensorDataset(train_obs, train_next_obs, train_act_targets)
+    dataset = TensorDataset(train_obs, train_next_obs, train_acts, train_act_targets)
     loader = DataLoader(dataset, batch_size=batch_size, shuffle=True, num_workers=2)
     inv_mse = 0
     t0 = t.time()
     b = list(loader)[0]
 
-    for batch_idx, (obs, next_obs, act_targets) in enumerate(loader):
+    for batch_idx, (obs, next_obs, train_acts, act_targets) in enumerate(loader):
         obs_batch = (obs).to(device)
         next_obs_batch = next_obs.to(device)
         # obs_valid_batch = obs_valid.to(device)
         # target_batch = (targets).to(device)
+        act_batch = train_acts.to(device)
+
         act_target_batch = (act_targets).to(device)
 
         # Set Optimizer to Zero
         optimizer.zero_grad()
 
         # Forward Pass
-        pred_act = model(obs_batch, next_obs_batch)
+        pred_act = model(obs_batch, next_obs_batch,act_batch)
 
         loss_inv = mse(act_target_batch, pred_act)
 
@@ -152,27 +158,27 @@ def train_step(train_obs: np.ndarray, train_next_obs: np.ndarray, train_act_targ
 
     return avg_inv_rmse, t.time() - t0
             
-def eval(obs: np.ndarray, next_obs: np.ndarray, act_targets: np.ndarray,  batch_size: int, 
-        model, device):
+def eval(obs: np.ndarray, next_obs: np.ndarray, actions:np.ndarray,act_targets: np.ndarray,  batch_size: int):
     
-    dataset = TensorDataset(obs, next_obs, act_targets)
+    dataset = TensorDataset(obs, next_obs, actions, act_targets)
     loader = DataLoader(dataset, batch_size=batch_size, shuffle=True, num_workers=2)
     
     inv_mse = 0
     t0 = t.time()
     b = list(loader)[0]
 
-    for batch_idx, (obs, next_obs, act_targets) in enumerate(loader):
+    for batch_idx, (obs, next_obs, actions, act_targets) in enumerate(loader):
         with torch.no_grad():
             
             obs_batch = (obs).to(device)
             next_obs_batch = next_obs.to(device)
             # obs_valid_batch = obs_valid.to(device)
             # target_batch = (targets).to(device)
+            act_batch = actions.to(device)
             act_target_batch = (act_targets).to(device)
 
             # Forward Pass
-            pred_act = model(obs_batch, next_obs_batch)
+            pred_act = model(obs_batch, next_obs_batch,act_batch)
 
             loss_inv = mse(act_target_batch, pred_act)
 
@@ -182,23 +188,22 @@ def eval(obs: np.ndarray, next_obs: np.ndarray, act_targets: np.ndarray,  batch_
     return avg_inv_rmse, t.time() - t0
         
 
-def train(train_obs: np.ndarray, train_next_obs: np.ndarray, train_act_targets: np.ndarray,  train_batch_size: int,
-          val_obs: np.ndarray, val_next_obs: np.ndarray, val_act_targets: np.ndarray, val_batch_size: int,
-          model, device, optimizer, epochs, val_interval, save_path):
+def train(train_obs: np.ndarray, train_next_obs: np.ndarray, train_acts: np.ndarray, train_act_targets: np.ndarray,  train_batch_size: int,
+          val_obs: np.ndarray, val_next_obs: np.ndarray, val_acts:np.ndarray, val_act_targets: np.ndarray, val_batch_size: int,
+          epochs, val_interval, save_path):
           
     best_rmse = np.inf
     print(save_path)
     for i in range(epochs):
-        train_inv_rmse, time = train_step(train_obs, train_next_obs, train_act_targets,
-                                            batch_size = train_batch_size, model=model, device=device,
-                                            optimizer=optimizer)
+        train_inv_rmse, time = train_step(train_obs, train_next_obs, train_acts, train_act_targets,
+                                            batch_size = train_batch_size)
         print("Training Iteration {:04d}: Inverse RMSE: {:.5f}, Took {:4f} seconds".format(
             i + 1, train_inv_rmse, time))
         # writer.add_scalar("Loss/train_forward", train_fwd_rmse, i)
         # writer.add_scalar("Loss/train_inverse", train_inv_rmse, i)
         if val_obs is not None and val_act_targets is not None and i % val_interval == 0:
-            inv_rmse, time = eval(val_obs, val_next_obs, val_act_targets,
-                            batch_size=val_batch_size, model=model, device=device)
+            inv_rmse, time = eval(val_obs, val_next_obs, val_acts, val_act_targets,
+                            batch_size=val_batch_size)
             # print(inv_rmse)
             print("Validation: Inverse RMSE: {:.5f}".format(inv_rmse))
             if inv_rmse<best_rmse:
@@ -209,6 +214,33 @@ def train(train_obs: np.ndarray, train_next_obs: np.ndarray, train_act_targets: 
     # writer.close()
     print("Training Done!")
 
+def predict(obs: np.ndarray, next_obs: np.ndarray, actions: np.ndarray, act_targets: np.ndarray,  batch_size: int):
+    
+    act_mean_list = []
+    dataset = TensorDataset(obs, next_obs, actions, act_targets)
+    loader = DataLoader(dataset, batch_size=batch_size, shuffle=False, num_workers=2)
+
+    for batch_idx, (obs, next_obs, actions, act_targets) in enumerate(loader):
+        with torch.no_grad():
+            
+            obs_batch = (obs).to(device)
+            next_obs_batch = next_obs.to(device)
+            # obs_valid_batch = obs_valid.to(device)
+            # target_batch = (targets).to(device)
+            act_batch = actions.to(device)
+            # act_target_batch = (act_targets).to(device)
+
+            # Forward Pass
+            pred_act = model(obs_batch, next_obs_batch, act_batch)
+
+            act_mean_list.append(pred_act.cpu())
+
+            # loss_inv = mse(act_target_batch, pred_act)
+
+            # inv_mse += loss_inv.detach().cpu().numpy()
+    # avg_inv_rmse = np.sqrt(inv_mse / len(list(loader)))
+
+    return torch.cat(act_mean_list)
 
 
 #%%
@@ -239,6 +271,7 @@ train_obs,train_next_obs, train_act_targets, train_act, test_obs, test_next_obs,
 # batch_size = 1000
 # epochs = 250
 
+# save_path = os.getcwd() + '/experiments/Franka/saved_models/mujoco/ffn/model.torch' 
 save_path = os.getcwd() + '/experiments/Franka/saved_models/ffn/model.torch' 
 
 
@@ -259,38 +292,49 @@ save_path = os.getcwd() + '/experiments/Franka/saved_models/ffn/model.torch'
 
 
 #%%
-hidden_layers = [32]
+hidden_layers = [500]
 batch_size = 1000
 use_cuda_if_available = True
 load = False
-epochs=100
+epochs=50
 
 device = torch.device("cuda:0" if torch.cuda.is_available() and use_cuda_if_available else "cpu")
 print("Device is set to : ",device)
 
-learning_rate = 0.001
+learning_rate = 0.01
 
-ffn_model = FrankaFFNInv(input_size=28,
+model = FrankaFFNInv(input_size=35,
                         output_size=7,
                         given_layers = hidden_layers)
 
 
-optimizer = optim.Adam(ffn_model.parameters(), lr=learning_rate)
+optimizer = optim.Adam(model.parameters(), lr=learning_rate)
 #%%
 ##### Train the model
 if load == False:
-    train(train_obs, train_next_obs, train_act_targets,batch_size,
-            test_obs, test_next_obs, test_act_targets, val_batch_size=batch_size,
-            model = ffn_model, device=device, optimizer=optimizer, epochs=epochs,
+    train(train_obs, train_next_obs, train_act, train_act_targets,batch_size,
+            test_obs, test_next_obs, test_act, test_act_targets, val_batch_size=batch_size,
+            epochs=epochs,
             val_interval=1,
             save_path=save_path)
 
+# #%% debugging
+# dataset = TensorDataset(train_obs, train_next_obs, train_act_targets)
+# loader = DataLoader(dataset, batch_size=batch_size, shuffle=True, num_workers=2)
+
+# #%%
+# x,y,z=loader.dataset[0:2]
+# x = x.to(device)
+# y = y.to(device)
+
+# p = model(x,y)
+
 #%%
 ##### Load best model
-ffn_model.load_state_dict(torch.load(save_path))
+model.load_state_dict(torch.load(save_path))
 
 ##### Test RMSE
-# pred = acrkn_infer.predict(test_obs, test_act, test_obs_valid, test_targets, batch_size=500)
+pred = predict(test_obs, test_next_obs, test_act, test_act_targets, batch_size=batch_size)
 
 
 if tar_type=='delta':
