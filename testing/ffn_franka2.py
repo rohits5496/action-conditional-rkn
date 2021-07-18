@@ -19,7 +19,7 @@ from data.frankaData_FFNN_Inv import boschRobot
 # from rkn.acrkn.InverseLearning import Learn
 # from rkn.acrkn.InverseInference import Infer
 from util.ConfigDict import ConfigDict
-from util.metrics import naive_baseline, root_mean_squared
+from util.metrics import naive_baseline, plot_data, root_mean_squared_simple, naive_baseline_simple, plot_data
 from util.dataProcess import diffToAct
 
 #os.environ["CUDA_VISIBLE_DEVICES"] = ""
@@ -68,44 +68,7 @@ def generate_franka_data_set_ffn(data, percentage_imputation):
            torch.from_numpy(test_act_targets).float(), torch.from_numpy(test_act).float())
 
 
-def root_mean_squared_simple(pred, target, data=[], tar='observations', fromStep=0, denorma=False, plot=None):
-    """
-    root mean squared error
-    :param target: ground truth positions
-    :param pred_mean_var: mean and covar (as concatenated vector, as provided by model)
-    :return: root mean squared error between targets and predicted mean, predicted variance is ignored
-    """
-    # pred = pred[..., :target.shape[-1]]
 
-    sumSquare = 0
-    count = 0
-    if plot != None:
-        for idx in range(target.shape[1]):
-            plt.plot(target[1000:1100,idx],label='target')
-            plt.plot(pred[1000:1100,idx],label='prediction')
-            plt.legend()
-            plt.show()
-
-    if denorma==True:
-        pred = denorm(pred, data, tar)
-        target = denorm(target, data, tar)
-
-    #RMSE Dimension wise
-    for i in range(target.shape[1]):
-        se = (target[:,i]-pred[:,i])**2
-        rmse = np.sqrt(np.mean(se))
-        print("RMSE of Joint ",i," = ",rmse)
-    
-    #element wise
-    sumSquare = np.sum((target-pred)**2)
-    numSamples = 1
-    for dim in target.shape:
-        numSamples = numSamples * dim
-
-
-    return np.sqrt(sumSquare / numSamples)
-
-#%%
 class FrankaFFNInv(nn.Module):
 
     def __init__(self, input_size, output_size, given_layers,
@@ -283,6 +246,17 @@ def predict(obs: np.ndarray, next_obs: np.ndarray, act_targets: np.ndarray,  bat
 
     return torch.cat(act_mean_list)
 
+def predict_single(obs: np.ndarray, next_obs: np.ndarray, prev_action: np.ndarray, data : object):
+    
+    with torch.no_grad():
+        obs = obs.to(device)
+        next_obs = next_obs.to(device)
+        pred_raw = model(obs, next_obs)
+
+    # denormalize and compute next obs
+    pred_act = diffToAct(pred_raw.cpu().detach().numpy(),prev_action,data,standardize=True, post_standardize=False)
+
+    return pred_act
 
 
 
@@ -293,7 +267,9 @@ def predict(obs: np.ndarray, next_obs: np.ndarray, act_targets: np.ndarray,  bat
 dim = 14
 tar_type = 'delta'  #'delta' - if to train on differences to previous actions/ current states
                     #'next_state' - if to trian directly the current ground truth actions / next states
-data = boschRobot(standardize=True, targets=tar_type)
+
+data_to_use = 'original'
+data = boschRobot(standardize=True, targets=tar_type, data_to_use=data_to_use)
 impu = 0.00
 # train_obs, train_act, train_obs_valid, train_targets, train_act_targets, test_obs, test_act, test_obs_valid, test_targets, test_act_targets = generate_franka_data_set(
 #     data, impu)
@@ -302,23 +278,17 @@ impu = 0.00
 train_obs,train_next_obs, train_act_targets, train_act, test_obs, test_next_obs, test_act_targets, test_act = generate_franka_data_set_ffn(data,impu)
 
 # """Naive Baseline - Predicting Previous Actions"""
-# naive_baseline(train_act[:, :-1, :], train_act[:, 1:, :], data, 'actions', steps=[1, 3, 5, 10, 20], denorma=True)
-# naive_baseline(test_act[:, :-1, :], test_act[:, 1:, :], data, 'actions', steps=[1, 3, 5, 10, 20], denorma=True)
 
-# naive_baseline(train_act[:-1], train_act[1:], data, 'actions', steps=[1, 3, 5, 10, 20], denorma=True)
-# 
-
-# """Model Parameters"""
-# latent_obs_dim = 15
-# act_dim = 7
-
-# batch_size = 1000
-# epochs = 250
-
-# save_path = os.getcwd() + '/experiments/Franka/saved_models/mujoco/ffn/model.torch' 
-save_path = os.getcwd() + '/experiments/Franka/saved_models/ffn/model.torch' 
+naive_baseline_simple(train_act[:-1,], train_act[1:,], data, 'actions',steps=[1,3,5,10], denorma=True )
+# naive_baseline_simple(train_act[:-1,], train_act[1:,], data, 'actions',steps=[1], denorma=True, plot=1 )
 
 
+if data_to_use=='original':
+    save_path = os.getcwd() + '/experiments/Franka/saved_models/ffn/model.torch' 
+else:
+    save_path = os.getcwd() + '/experiments/Franka/saved_models/mujoco/ffn/model.torch' 
+
+print("\n\nSave path is : ",save_path)
 
 
 
@@ -378,7 +348,6 @@ if load == False:
 ##### Load best model
 model.load_state_dict(torch.load(save_path))
 
-#%%
 ##### Test RMSE
 pred_raw = predict(test_obs, test_next_obs, test_act_targets, batch_size=batch_size)
 

@@ -12,9 +12,12 @@ class boschRobot():
 
     name = 'boschrobot'
 
-    def __init__(self, standardize=True, targets='current_state', dim=14):
-        self.datapath = os.getcwd() + '/data/FrankaData/rubber_acce/without/'
-        # self.datapath = os.getcwd() + '/data/FrankaData/mujoco/'
+    def __init__(self, standardize=True, targets='current_state', data_to_use="original",dim=14):
+        # 
+        if (data_to_use =='original'):
+            self.datapath   = os.getcwd() + '/data/FrankaData/rubber_acce/without/'
+        else:
+            self.datapath = os.getcwd() + '/data/FrankaData/mujoco/'
 
         self.dim = dim
         self.downsample = 1

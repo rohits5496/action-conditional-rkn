@@ -63,7 +63,7 @@ def diffToState(diff,current,data,standardize=True):
 
     return next,diff
 
-def diffToAct(diff,prev,data,standardize=True):
+def diffToAct(diff,prev,data,standardize=True, post_standardize=True):
     '''
     :param diff: difference between next and current state
     :param current: current state
@@ -80,9 +80,13 @@ def diffToAct(diff,prev,data,standardize=True):
         prev = denorm(prev, data, 'actions')
         diff = denorm(diff, data, "act_diff")
 
-        current = norm(prev + diff, data, "actions")
+        # current = norm(prev + diff, data, "actions")
+        current = prev+diff
     else:
         current = prev + diff
+
+    if standardize and post_standardize:
+        current = norm(current, data, 'actions')
 
     return current,diff
 
