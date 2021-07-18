@@ -248,6 +248,11 @@ def predict(obs: np.ndarray, next_obs: np.ndarray, act_targets: np.ndarray,  bat
 
 def predict_single(obs: np.ndarray, next_obs: np.ndarray, prev_action: np.ndarray, data : object):
     
+    #normalize 
+
+    obs = norm(obs, data, tar_type='observations')
+    next_obs = norm(next_obs, data, tar_type='observation')
+    
     with torch.no_grad():
         obs = obs.to(device)
         next_obs = next_obs.to(device)
