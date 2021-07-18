@@ -252,7 +252,7 @@ def predict_single(obs: np.ndarray, next_obs: np.ndarray, prev_action: np.ndarra
 
     obs = norm(obs, data, tar_type='observations')
     next_obs = norm(next_obs, data, tar_type='observation')
-    
+
     with torch.no_grad():
         obs = obs.to(device)
         next_obs = next_obs.to(device)
@@ -273,7 +273,7 @@ dim = 14
 tar_type = 'delta'  #'delta' - if to train on differences to previous actions/ current states
                     #'next_state' - if to trian directly the current ground truth actions / next states
 
-data_to_use = 'original'
+data_to_use = 'new'
 data = boschRobot(standardize=True, targets=tar_type, data_to_use=data_to_use)
 impu = 0.00
 # train_obs, train_act, train_obs_valid, train_targets, train_act_targets, test_obs, test_act, test_obs_valid, test_targets, test_act_targets = generate_franka_data_set(
