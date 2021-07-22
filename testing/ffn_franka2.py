@@ -5,6 +5,7 @@ import time as t
 import sys
 # sys.path.append('.')
 os.chdir("/home/i53/student/rohit_sonker/action-conditional-rkn")
+print("Current dir : ",os.getcwd())
 
 
 import argparse
@@ -314,7 +315,7 @@ print("\n\nSave path is : ",save_path)
 hidden_layers = [500,500,500]
 batch_size = 1000
 use_cuda_if_available = True
-load = False
+load = True
 epochs=50
 
 device = torch.device("cuda:0" if torch.cuda.is_available() and use_cuda_if_available else "cpu")

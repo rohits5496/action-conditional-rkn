@@ -55,6 +55,16 @@ def root_mean_squared_simple(pred, target, data=[], tar='observations', fromStep
             plt.legend()
             plt.show()
 
+    if plot=='print_plot':
+
+        for idx in range(target.shape[1]):
+            plt.subplot(3,3,idx)
+            plt.plot(target[1000:1100,idx],label='target')
+            plt.plot(pred[1000:1100,idx],label='prediction')
+            plt.legend()
+        
+        plt.show()
+
     if denorma==True:
         pred = denorm(pred, data, tar)
         target = denorm(target, data, tar)
