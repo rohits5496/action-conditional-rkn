@@ -5,11 +5,11 @@ import time as t
 import sys
 # sys.path.append('.')
 
-# os.chdir("/home/i53/student/rohit_sonker/action-conditional-rkn")
-# log_dir = '/home/temp_store/rohit_sonker'
+os.chdir("/home/i53/student/rohit_sonker/action-conditional-rkn")
+log_dir = '/home/temp_store/rohit_sonker'
 
-os.chdir("/home/rohit/action-conditional-rkn")
-log_dir = "/home/rohit/logs"
+# os.chdir("/home/rohit/action-conditional-rkn")
+# log_dir = "/home/rohit/logs"
 
 print("Current dir : ",os.getcwd())
 
@@ -96,7 +96,7 @@ class FrankaFFNInv(nn.Module):
 
         self._log = bool(log)
         if self._log:
-            self._run = wandb.init(project="feedforward", name="ffn", dir = log_dir)
+            self._run = wandb.init(project="feedforward_mujoco", name="ffn", dir = log_dir)
 
 
     def _buid_hidden_layers(self, input_size, given_layers, output_size):
@@ -312,10 +312,10 @@ print("\n\nSave path is : ",save_path)
 
 #%%
 hidden_layers = [500,500]
-batch_size = 512
+batch_size = 1000
 use_cuda_if_available = True
 load = False
-epochs=10
+epochs=50
 
 # device = torch.device("cuda:0" if torch.cuda.is_available() and use_cuda_if_available else "cpu")
 # # device='cpu'
@@ -361,7 +361,7 @@ if load == False:
 
 #%%
 ##### Load best model
-# model.load_state_dict(torch.load(save_path))
+model.load_state_dict(torch.load(save_path))
 
 ##### Test RMSE
 pred_raw = model.predict(test_obs, test_next_obs, test_act_targets, batch_size=batch_size)
@@ -375,6 +375,24 @@ else:
 
 #%%
 rmse = root_mean_squared_simple(pred, test_act.cpu().detach().cpu(), data, tar='actions', denorma=True,
-                            plot=[1, 2, 3])
+                            plot=1)
 print('Inverse RMSE Final', rmse)
+
+
+#%%
+target = test_act.cpu().detach().cpu()
+
+from matplotlib import pyplot as plt
+
+plt.figure(figsize=(16, 16)) 
+for idx in range(0,target.shape[1]):
+    print(idx)
+    plt.subplot(3,3,idx+1)
+    plt.plot(target[1000:1100,idx],label='target')
+    plt.plot(pred[1000:1100,idx],label='prediction')
+    plt.legend()
+
+
+plt.savefig("plots/mujoco_data_ffn.png", dpi=100)
+plt.show()
 # %%

@@ -48,22 +48,26 @@ def root_mean_squared_simple(pred, target, data=[], tar='observations', fromStep
 
     sumSquare = 0
     count = 0
-    if plot != None:
-        for idx in range(target.shape[1]):
+
+    if plot=='print_plot':
+        fig, ax = plt.subplot(3,3)
+        for idx in range(0,target.shape[1]):
+            print(idx)
+            ax[idx].plot(target[1000:1100,idx],label='target')
+            ax[idx].plot(pred[1000:1100,idx],label='prediction')
+            ax[idx].legend()
+        
+        plt.show()
+        fig.savefig("mujoco_data_ffn.png", dpi=500)
+        
+    elif plot != None:
+        for idx in range(0,target.shape[1]):
             plt.plot(target[1000:1100,idx],label='target')
             plt.plot(pred[1000:1100,idx],label='prediction')
             plt.legend()
             plt.show()
 
-    if plot=='print_plot':
-
-        for idx in range(target.shape[1]):
-            plt.subplot(3,3,idx)
-            plt.plot(target[1000:1100,idx],label='target')
-            plt.plot(pred[1000:1100,idx],label='prediction')
-            plt.legend()
-        
-        plt.show()
+    
 
     if denorma==True:
         pred = denorm(pred, data, tar)
