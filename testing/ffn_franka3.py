@@ -91,7 +91,7 @@ class FrankaFFNInv(nn.Module):
             self._save_path = save_path
 
         self._learning_rate = lr
-        self._optimizer = optim.Adam(self._model.parameters(), lr=self._learning_rate)
+        self._optimizer = optim.Adam(self.parameters(), lr=self._learning_rate)
         self._shuffle_rng = np.random.RandomState(42)  # rng for shuffling batches
 
         self._log = bool(log)
@@ -143,7 +143,7 @@ class FrankaFFNInv(nn.Module):
             act_target_batch = (act_targets).to(self._device)
 
             # Set Optimizer to Zero
-            optimizer.zero_grad()
+            self._optimizer.zero_grad()
 
             # Forward Pass
             pred_act = self(obs_batch, next_obs_batch)
@@ -219,7 +219,7 @@ class FrankaFFNInv(nn.Module):
                                 "epochs": i})
             
             if val_obs is not None and val_act_targets is not None and i % val_interval == 0:
-                inv_rmse, time = eval(val_obs, val_next_obs, val_act_targets,
+                inv_rmse, time = self.eval(val_obs, val_next_obs, val_act_targets,
                                 batch_size=val_batch_size)
                 # print(inv_rmse)
                 print("Validation: Inverse RMSE: {:.5f}".format(inv_rmse))
@@ -311,11 +311,11 @@ print("\n\nSave path is : ",save_path)
 
 
 #%%
-hidden_layers = [500,500,500]
-batch_size = 5000
+hidden_layers = [500,500]
+batch_size = 512
 use_cuda_if_available = True
 load = False
-epochs=25
+epochs=10
 
 # device = torch.device("cuda:0" if torch.cuda.is_available() and use_cuda_if_available else "cpu")
 # # device='cpu'
@@ -332,8 +332,8 @@ model = FrankaFFNInv(input_size=28,
                         log = True)
 
 # model.to(device)
-
-optimizer = optim.Adam(model.parameters(), lr=learning_rate)
+print("Device is : ", model._device)
+# optimizer = optim.Adam(model.parameters(), lr=learning_rate)
 # optimizer = optim.SGD(model.parameters(), lr=learning_rate, momentum=0.9)
 
 #%%
@@ -344,9 +344,8 @@ if load == False:
     model.train(train_obs, train_next_obs, train_act_targets,batch_size,
             test_obs, test_next_obs, test_act_targets, val_batch_size=batch_size,
             epochs=epochs,
-            val_interval=1,
-            save_path=save_path,
-            log=True)
+            val_interval=1)
+
     
 
 # #%% debugging
@@ -362,7 +361,7 @@ if load == False:
 
 #%%
 ##### Load best model
-model.load_state_dict(torch.load(save_path))
+# model.load_state_dict(torch.load(save_path))
 
 ##### Test RMSE
 pred_raw = model.predict(test_obs, test_next_obs, test_act_targets, batch_size=batch_size)
