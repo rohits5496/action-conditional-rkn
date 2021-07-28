@@ -17,7 +17,7 @@ class boschRobot():
         if (data_to_use =='original'):
             self.datapath   = os.getcwd() + '/data/FrankaData/rubber_acce/without/'
         else:
-            self.datapath = os.getcwd() + '/data/FrankaData/mujoco/'
+            self.datapath = os.getcwd() + '/data/FrankaData/mujoco/1/'
 
         self.dim = dim
         self.downsample = 1
