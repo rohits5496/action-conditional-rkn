@@ -290,7 +290,7 @@ dim = 14
 tar_type = 'delta'  #'delta' - if to train on differences to previous actions/ current states
                     #'next_state' - if to trian directly the current ground truth actions / next states
 
-data_to_use = 'original'
+data_to_use = 'new'
 data = boschRobot(standardize=True, targets=tar_type, data_to_use=data_to_use)
 impu = 0.00
 
