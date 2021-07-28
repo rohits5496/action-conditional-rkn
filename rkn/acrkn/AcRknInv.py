@@ -6,8 +6,8 @@ from rkn.acrkn.Decoder import SplitDiagGaussianDecoder, SimpleDecoder
 from rkn.acrkn.AcRKNLayerInv import AcRKNLayerInv
 from util.ConfigDict import ConfigDict
 from typing import Tuple
-from torch.utils.tensorboard import SummaryWriter
-writer = SummaryWriter('/home/i53/student/rohit_sonker/action-conditional-rkn/Logs/ALRhub/fwd_noinit5')
+# from torch.utils.tensorboard import SummaryWriter
+# writer = SummaryWriter('/home/temp_store/rohit_sonker/Logs/ALRhub/fwd_noinit5')
 
 optim = torch.optim
 nn = torch.nn

@@ -1,5 +1,10 @@
 import os
 import sys
+
+os.chdir("/home/i53/student/rohit_sonker/action-conditional-rkn")
+print("Current dir : ",os.getcwd())
+
+
 sys.path.append('.')
 
 import argparse
@@ -72,7 +77,8 @@ act_dim = 7
 batch_size = 1000
 epochs = 250
 # save_path = os.getcwd() + '/experiments/Franka/saved_models/mujoco/model.torch' #mujoco data
-save_path = os.getcwd() + '/experiments/Franka/saved_models/model.torch' #original
+save_path = os.getcwd() + '/experiments/Franka/saved_models/acrkn/model.torch' #original data
+
 
 
 def experiment(encoder_dense, decoder_dense, act_decoder_dense, batch_size, num_basis, control_basis, latent_obs_dim, lr, epochs, load,
@@ -178,16 +184,23 @@ def experiment(encoder_dense, decoder_dense, act_decoder_dense, batch_size, num_
                              plot=[1, 2, 3])
     print('Inverse RMSE Final', rmse)
 
+#%%
+experiment(120, 240, 512, 8,
+             15, 45, 30, 1.39e-2,5,
+             False, 'franka_inverse','0')
+
+#%%
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--encoder', default=120, help='Observation Encoder Hidden Layer Size')
     parser.add_argument('--decoder', default=240, help='Observation Decoder Hidden Layer Size')
-    parser.add_argument('--act_decoder', default=512, help='Action Decoder Hidden Layer Size')
-    parser.add_argument('--batch_size', default=8, help='Batch Size') #default 250
+    parser.add_argument('--act_decoder', default=512, help='Action Decoder Hidden Layer Size') #512
+    parser.add_argument('--batch_size', default=250, help='Batch Size') #default 250
     parser.add_argument('--num_basis', default=15, help='Number Of Basis Matrices In Locally Linear Transition Model')
-    parser.add_argument('--control_basis', default=120, help='Hidden Layer Size For Action Conditioning NN')
+    parser.add_argument('--control_basis', default=45, help='Hidden Layer Size For Action Conditioning NN') #120
     parser.add_argument('--latent_dim', default=60, help='Latent State Dimension Of RKN Cell') #15 #60
-    parser.add_argument('--lr', default=1e-1, help='Learning Rate') #7e-3
+    parser.add_argument('--lr', default=1.39e-2, help='Learning Rate') #7e-3
     parser.add_argument('--epochs', default=5, help='Number Of Epochs To Train') #750
     parser.add_argument('--load', default=True, help='If to Load saved model or train from scratch') #False
     parser.add_argument('--exp', default='franka_inverse', help='Name Of Experiment')

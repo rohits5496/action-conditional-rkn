@@ -30,7 +30,7 @@ from torch.utils.tensorboard import SummaryWriter
 from util.Losses import mse
 from util.dataProcess import norm, denorm
 from matplotlib import pyplot as plt
-
+import wandb
 
 optim = torch.optim
 nn = torch.nn
@@ -74,16 +74,11 @@ class FrankaFFNInv(nn.Module):
 
     def __init__(self, input_size, output_size, given_layers,
                     use_cuda_if_available: bool = True):
-        # self._layer_norm = layer_norm
+
         super(FrankaFFNInv, self).__init__()
         self._device = torch.device("cuda" if torch.cuda.is_available() and use_cuda_if_available else "cpu")
-        self._layers = self._buid_hidden_layers(input_size, given_layers, output_size)
-        # self._dropout = nn.Dropout(0.5)
-        # self._layers = nn.Sequential(
-        #     nn.Linear(input_size, 32),
-        #     nn.ReLU(),
-        #     nn.Linear(32, 7)
-        # )
+        self._layers = self._buid_hidden_layers(input_size, given_layers, output_size).to(self._device)
+
 
         if save_path is None:
             self._save_path = os.getcwd() + '/experiments/Franka/saved_models/model.torch'
@@ -93,6 +88,10 @@ class FrankaFFNInv(nn.Module):
 
         # self._optimizer = optim.Adam(self._model.parameters(), lr=self._learning_rate)
         # self._shuffle_rng = np.random.RandomState(42)  # rng for shuffling batches
+
+        # self._log = bool(log)
+        # if self._log:
+        #     self._run = wandb.init(project=project_name, name=exp_name, dir = '/home/temp_store/rohit_sonker')
 
 
     def _buid_hidden_layers(self, input_size, given_layers, output_size):
@@ -195,7 +194,7 @@ def eval(obs: np.ndarray, next_obs: np.ndarray, act_targets: np.ndarray,  batch_
 
 def train(train_obs: np.ndarray, train_next_obs: np.ndarray, train_act_targets: np.ndarray,  train_batch_size: int,
           val_obs: np.ndarray, val_next_obs: np.ndarray, val_act_targets: np.ndarray, val_batch_size: int,
-          epochs, val_interval, save_path):
+          epochs, val_interval, save_path, log=True):
           
     best_rmse = np.inf
     print(save_path)
@@ -206,6 +205,11 @@ def train(train_obs: np.ndarray, train_next_obs: np.ndarray, train_act_targets: 
             i + 1, train_inv_rmse, time))
         # writer.add_scalar("Loss/train_forward", train_fwd_rmse, i)
         # writer.add_scalar("Loss/train_inverse", train_inv_rmse, i)
+
+        if log:
+            wandb.log({"train_inverse_rmse": train_inv_rmse,
+                            "epochs": i})
+        
         if val_obs is not None and val_act_targets is not None and i % val_interval == 0:
             inv_rmse, time = eval(val_obs, val_next_obs, val_act_targets,
                             batch_size=val_batch_size)
@@ -216,7 +220,11 @@ def train(train_obs: np.ndarray, train_next_obs: np.ndarray, train_act_targets: 
     #     writer.add_scalar("Loss/test_forward", fwd_rmse, i)
     #     writer.add_scalar("Loss/test_inverse", inv_rmse, i)
     #     writer.flush()
+            if log:
+                wandb.log({"val_inverse_rmse": inv_rmse,
+                           "epochs": i})
     # writer.close()
+
     print("Training Done!")
 
 def predict(obs: np.ndarray, next_obs: np.ndarray, act_targets: np.ndarray,  batch_size: int):
@@ -274,12 +282,9 @@ dim = 14
 tar_type = 'delta'  #'delta' - if to train on differences to previous actions/ current states
                     #'next_state' - if to trian directly the current ground truth actions / next states
 
-data_to_use = 'new'
+data_to_use = 'original'
 data = boschRobot(standardize=True, targets=tar_type, data_to_use=data_to_use)
 impu = 0.00
-# train_obs, train_act, train_obs_valid, train_targets, train_act_targets, test_obs, test_act, test_obs_valid, test_targets, test_act_targets = generate_franka_data_set(
-#     data, impu)
-
 
 train_obs,train_next_obs, train_act_targets, train_act, test_obs, test_next_obs, test_act_targets, test_act = generate_franka_data_set_ffn(data,impu)
 
@@ -297,28 +302,15 @@ else:
 print("\n\nSave path is : ",save_path)
 
 
-
-# def experiment(layers, decoder_dense, act_decoder_dense, batch_size, num_basis, control_basis, latent_obs_dim, lr, epochs, load,
-#                expName,
-#                gpu):
-    # '''
-    # joints : Give a list of joints (0-6) on which you want to train on eg: [1,4]
-    # lr: Learning Rate
-    # '''
-    
-    ## Manually defining for now remove later
-
-    ##### Define Model and Train It
-
-
 #%%
 hidden_layers = [500,500,500]
-batch_size = 1000
+batch_size = 5000
 use_cuda_if_available = True
-load = True
-epochs=50
+load = False
+epochs=25
 
 device = torch.device("cuda:0" if torch.cuda.is_available() and use_cuda_if_available else "cpu")
+# device='cpu'
 print("Device is set to : ",device)
 
 learning_rate = 0.01
@@ -327,17 +319,23 @@ model = FrankaFFNInv(input_size=28,
                         output_size=7,
                         given_layers = hidden_layers)
 
+# model.to(device)
 
-# optimizer = optim.Adam(model.parameters(), lr=learning_rate)
-optimizer = optim.SGD(model.parameters(), lr=learning_rate, momentum=0.9)
+optimizer = optim.Adam(model.parameters(), lr=learning_rate)
+# optimizer = optim.SGD(model.parameters(), lr=learning_rate, momentum=0.9)
+
 #%%
 ##### Train the model
 if load == False:
+    wandb_run = wandb.init(project="acrkn", name="ffn", dir = '/home/temp_store/rohit_sonker')
+
     train(train_obs, train_next_obs, train_act_targets,batch_size,
             test_obs, test_next_obs, test_act_targets, val_batch_size=batch_size,
             epochs=epochs,
             val_interval=1,
-            save_path=save_path)
+            save_path=save_path,
+            log=True)
+    wandb_run.finish()
 
 # #%% debugging
 # dataset = TensorDataset(train_obs, train_next_obs, train_act_targets)

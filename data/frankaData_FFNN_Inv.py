@@ -12,7 +12,7 @@ class boschRobot():
 
     name = 'boschrobot'
 
-    def __init__(self, standardize=True, targets='current_state', data_to_use="original",dim=14):
+    def __init__(self, standardize=True, targets='current_state', dim=14,data_to_use="original"):
         # 
         if (data_to_use =='original'):
             self.datapath   = os.getcwd() + '/data/FrankaData/rubber_acce/without/'

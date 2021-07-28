@@ -5,12 +5,13 @@ from typing import Tuple
 import numpy as np
 import torch
 from torch.utils.data import TensorDataset, DataLoader
-from torch.utils.tensorboard import SummaryWriter
+# from torch.utils.tensorboard import SummaryWriter
+import wandb
 
 from rkn.acrkn.AcRknInv import AcRknInv
 from util.Losses import mse
 
-writer = SummaryWriter('/home/i53/student/rohit_sonker/action-conditional-rkn/Logs/ALRhub/INV_jointspace-lam.1')
+# writer = SummaryWriter('/home/temp_store/rohit_sonker/Logs/ALRhub/INV_jointspace-lam.1')
 
 optim = torch.optim
 nn = torch.nn
@@ -19,7 +20,7 @@ nn = torch.nn
 class Learn:
 
     def __init__(self, model: AcRknInv, lam: float, feature_space: bool, save_path=None,
-                 use_cuda_if_available: bool = True):
+                 use_cuda_if_available: bool = True, log:bool=True, project_name = "acrkn", exp_name="acrkn_learn"):
 
         """
         :param model: nn module for acrkn
@@ -40,6 +41,9 @@ class Learn:
 
         self._optimizer = optim.Adam(self._model.parameters(), lr=self._learning_rate)
         self._shuffle_rng = np.random.RandomState(42)  # rng for shuffling batches
+        self._log = bool(log)
+        if self._log:
+            self._run = wandb.init(project=project_name, name=exp_name, dir = '/home/temp_store/rohit_sonker')
 
     def train_step(self, train_obs: np.ndarray, train_act: np.ndarray, train_obs_valid: np.ndarray,
                    train_targets: np.ndarray, train_act_targets: np.ndarray, batch_size: int) \
@@ -169,21 +173,34 @@ class Learn:
             val_batch_size = 4 * batch_size
 
         best_rmse = np.inf
+        wandb.watch(self._model,log=all)
 
         for i in range(epochs):
             train_fwd_rmse, train_inv_rmse, time = self.train_step(train_obs, train_act, train_obs_valid, train_targets,
                                                                    train_act_targets, batch_size)
             print("Training Iteration {:04d}: Forward RMSE: {:.5f}, Inverse RMSE: {:.5f}, Took {:4f} seconds".format(
                 i + 1, train_fwd_rmse, train_inv_rmse, time))
-            writer.add_scalar("Loss/train_forward", train_fwd_rmse, i)
-            writer.add_scalar("Loss/train_inverse", train_inv_rmse, i)
+
+            # writer.add_scalar("Loss/train_forward", train_fwd_rmse, i)
+            # writer.add_scalar("Loss/train_inverse", train_inv_rmse, i)
+            
+            if self._log:
+                wandb.log({"train_forward_rmse": train_fwd_rmse, "train_inverse_rmse": train_inv_rmse,
+                            "epochs": i})
+
             if val_obs is not None and val_targets is not None and i % val_interval == 0:
                 fwd_rmse, inv_rmse = self.eval(val_obs, val_act, val_obs_valid, val_targets, val_act_targets,
                                                batch_size=val_batch_size)
                 print("Validation: Forward RMSE: {:.5f}, Inverse RMSE: {:.5f}".format(fwd_rmse, inv_rmse))
                 if inv_rmse<best_rmse:
                     torch.save(self._model.state_dict(), self._save_path)
-            writer.add_scalar("Loss/test_forward", fwd_rmse, i)
-            writer.add_scalar("Loss/test_inverse", inv_rmse, i)
-            writer.flush()
-        writer.close()
+            # writer.add_scalar("Loss/test_forward", fwd_rmse, i)
+            # writer.add_scalar("Loss/test_inverse", inv_rmse, i)
+            # writer.flush()
+
+            if self._log:
+                wandb.log({"val_forward_rmse": fwd_rmse, "val_inverse_rmse": inv_rmse,
+                           "epochs": i})
+
+        # writer.close()
+        self._run.finish()
