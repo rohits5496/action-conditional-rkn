@@ -3,7 +3,7 @@ import numpy as np
 
 from util.dataProcess import norm, denorm
 
-def root_mean_squared(pred, target, data=[], tar='observations', fromStep=0, denorma=False, plot=None):
+def root_mean_squared(pred, target, data=[], tar='observations', fromStep=0, denorma=False, plot=None,plot_name=None):
     """
     root mean squared error
     :param target: ground truth positions
@@ -14,7 +14,23 @@ def root_mean_squared(pred, target, data=[], tar='observations', fromStep=0, den
 
     sumSquare = 0
     count = 0
-    if plot != None:
+
+    if plot=='print_plot':
+        plt.figure(figsize=(16, 16)) 
+        for idx in range(0,target.shape[2]):
+            # print(idx)
+            plt.subplot(3,3,idx+1)
+            plt.plot(target[3,:,idx],label='target')
+            plt.plot(pred[3,:,idx],label='prediction')
+            plt.legend()
+
+
+        if plot_name is not None:
+            plt.savefig("plots/"+plot_name, dpi=100)
+        else:
+            plt.savefig("plots/ackrn_plot.py", dpi=100)
+        plt.show()
+    elif plot != None:
         for idx in range(target.shape[2]):
             plt.plot(target[3,:,idx],label='target')
             plt.plot(pred[3,:,idx],label='prediction')
@@ -25,6 +41,11 @@ def root_mean_squared(pred, target, data=[], tar='observations', fromStep=0, den
         pred = denorm(pred, data, tar)
         target = denorm(target, data, tar)
 
+    #RMSE Dimension wise
+    for idx in range(target.shape[2]):
+        numSamples = target.shape[0]*target.shape[1]
+        sumSquare = np.sum((target[:,:,idx]-pred[:,:,idx])**2)
+        print("Joint ",idx," Inverse RMSE = ", np.sqrt(sumSquare/numSamples))
 
 
     #target = target[:, fromStep:, :]
@@ -37,7 +58,7 @@ def root_mean_squared(pred, target, data=[], tar='observations', fromStep=0, den
     return np.sqrt(sumSquare / numSamples)
 
 
-def root_mean_squared_simple(pred, target, data=[], tar='observations', fromStep=0, denorma=False, plot=None):
+def root_mean_squared_simple(pred, target, data=[], tar='observations', fromStep=0, denorma=False, plot=None, plot_name=None):
     """
     root mean squared error
     :param target: ground truth positions
@@ -50,15 +71,19 @@ def root_mean_squared_simple(pred, target, data=[], tar='observations', fromStep
     count = 0
 
     if plot=='print_plot':
-        fig, ax = plt.subplot(3,3)
+        plt.figure(figsize=(16, 16)) 
         for idx in range(0,target.shape[1]):
-            print(idx)
-            ax[idx].plot(target[1000:1100,idx],label='target')
-            ax[idx].plot(pred[1000:1100,idx],label='prediction')
-            ax[idx].legend()
-        
+            # print(idx)
+            plt.subplot(3,3,idx+1)
+            plt.plot(target[1000:1100,idx],label='target')
+            plt.plot(pred[1000:1100,idx],label='prediction')
+            plt.legend()
+
+        if plot_name is not None:
+            plt.savefig("plots/"+plot_name, dpi=100)
+        else:
+            plt.savefig("plots/ffd.py", dpi=100)
         plt.show()
-        fig.savefig("mujoco_data_ffn.png", dpi=500)
         
     elif plot != None:
         for idx in range(0,target.shape[1]):
@@ -153,7 +178,7 @@ def comparison_plot(target,pred_list=[],name_list=[],data=[], tar='observations'
         #plt.legend()
     plt.show()
 
-def naive_baseline(current_obs,targets,data=[],tar_type='observations',steps=[1,3,5,10,20],denorma=False):
+def naive_baseline(current_obs,targets,data=[],tar_type='observations',steps=[1,3,5,10,20],denorma=False, plot=None, plot_name=None):
     '''
     :param current_obs: current available observations
     :param targets: actual targets
@@ -171,7 +196,7 @@ def naive_baseline(current_obs,targets,data=[],tar_type='observations',steps=[1,
         else:
             pred = current_obs[:,:-(step-1),:]
         tar = targets[:,step-1:,:]
-        print('root mean square error step',step,root_mean_squared(pred,tar,data,tar=tar_type,denorma=denorma))
+        print('root mean square error step',step,root_mean_squared(pred,tar,data,tar=tar_type,denorma=denorma,plot=plot, plot_name=plot_name))
 
 
 def naive_baseline_simple(current_obs,targets,data=[],tar_type='observations',steps=[1,3,5,10,20],denorma=False, plot=None):

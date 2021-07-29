@@ -18,7 +18,7 @@ from rkn_cell.acrkn_cell import AcRKNCell
 from rkn.acrkn.InverseLearning import Learn
 from rkn.acrkn.InverseInference import Infer
 from util.ConfigDict import ConfigDict
-from util.metrics import naive_baseline, root_mean_squared
+from util.metrics import naive_baseline, root_mean_squared,joint_mse
 from util.dataProcess import diffToAct
 
 #os.environ["CUDA_VISIBLE_DEVICES"] = ""
@@ -68,7 +68,7 @@ train_obs, train_act, train_obs_valid, train_targets, train_act_targets, test_ob
 
 """Naive Baseline - Predicting Previous Actions"""
 naive_baseline(train_act[:, :-1, :], train_act[:, 1:, :], data, 'actions', steps=[1, 3, 5, 10, 20], denorma=True)
-naive_baseline(test_act[:, :-1, :], test_act[:, 1:, :], data, 'actions', steps=[1, 3, 5, 10, 20], denorma=True)
+# naive_baseline(test_act[:, :-1, :], test_act[:, 1:, :], data, 'actions', steps=[1], denorma=True,  plot='print_plot',plot_name='original_data_baseline1.png')
 
 """Model Parameters"""
 latent_obs_dim = 15
@@ -78,6 +78,12 @@ batch_size = 1000
 epochs = 250
 # save_path = os.getcwd() + '/experiments/Franka/saved_models/mujoco/model.torch' #mujoco data
 save_path = os.getcwd() + '/experiments/Franka/saved_models/acrkn/model.torch' #original data
+
+
+#load
+# save_path = os.getcwd() + '/experiments/Franka/saved_models/model.torch'
+
+print("Model directory is : ", save_path)
 
 
 
@@ -181,14 +187,15 @@ def experiment(encoder_dense, decoder_dense, act_decoder_dense, batch_size, num_
         pred = pred.cpu().detach().numpy()
 
     rmse = root_mean_squared(pred, test_act.cpu().detach().cpu(), data, tar='actions', denorma=True,
-                             plot=[1, 2, 3])
+                             plot='print_plot', plot_name = 'acrkn_original_data.png')
+    
     print('Inverse RMSE Final', rmse)
 
 #%%
 experiment(120, 240, 512, 8,
-             15, 45, 30, 1.39e-2,5,
+             15, 45, 30, 1.39e-2,75,
              False, 'franka_inverse','0')
-
+#reduce learning rate
 #%%
 
 def main():
