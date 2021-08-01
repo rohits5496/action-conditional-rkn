@@ -102,7 +102,8 @@ model = FrankaFFNInv(input_size=28,
                         lr=learning_rate,
                         save_path= save_path,    
                         use_cuda_if_available=True,
-                        log = True)
+                        log = True,
+                        log_dir = '/home/temp_store/rohit_sonker')
 
 
 # model.to(device)
