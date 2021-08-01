@@ -1,0 +1,167 @@
+Device is :  cuda
+/home/i53/student/rohit_sonker/action-conditional-rkn/experiments/Franka/saved_models/mujoco/ffn/model.torch
+Training Iteration 0001: Inverse RMSE: 0.47476, Took 12.267229 seconds
+Validation: Inverse RMSE: 0.26646
+Training Iteration 0002: Inverse RMSE: 0.42336, Took 12.456024 seconds
+Validation: Inverse RMSE: 0.27335
+Training Iteration 0003: Inverse RMSE: 0.41974, Took 12.382259 seconds
+Validation: Inverse RMSE: 0.24641
+Training Iteration 0004: Inverse RMSE: 0.41407, Took 12.413359 seconds
+Validation: Inverse RMSE: 0.23231
+Training Iteration 0005: Inverse RMSE: 0.40362, Took 12.154346 seconds
+Validation: Inverse RMSE: 0.23437
+Training Iteration 0006: Inverse RMSE: 0.40117, Took 12.870141 seconds
+Validation: Inverse RMSE: 0.22841
+Training Iteration 0007: Inverse RMSE: 0.40201, Took 12.629144 seconds
+Validation: Inverse RMSE: 0.22272
+Training Iteration 0008: Inverse RMSE: 0.39902, Took 12.516568 seconds
+Validation: Inverse RMSE: 0.20194
+Training Iteration 0009: Inverse RMSE: 0.39447, Took 12.543449 seconds
+Validation: Inverse RMSE: 0.20376
+Training Iteration 0010: Inverse RMSE: 0.39447, Took 13.181378 seconds
+Validation: Inverse RMSE: 0.21497
+Training Iteration 0011: Inverse RMSE: 0.39426, Took 12.708154 seconds
+Validation: Inverse RMSE: 0.20789
+Training Iteration 0012: Inverse RMSE: 0.39338, Took 12.636692 seconds
+Validation: Inverse RMSE: 0.19053
+Training Iteration 0013: Inverse RMSE: 0.39495, Took 12.314192 seconds
+Validation: Inverse RMSE: 0.19866
+Training Iteration 0014: Inverse RMSE: 0.39224, Took 12.455818 seconds
+Validation: Inverse RMSE: 0.23249
+Training Iteration 0015: Inverse RMSE: 0.39576, Took 12.476203 seconds
+Validation: Inverse RMSE: 0.20096
+Training Iteration 0016: Inverse RMSE: 0.39088, Took 12.455823 seconds
+Validation: Inverse RMSE: 0.19927
+Training Iteration 0017: Inverse RMSE: 0.39135, Took 12.441295 seconds
+Validation: Inverse RMSE: 0.18943
+Training Iteration 0018: Inverse RMSE: 0.38941, Took 12.527603 seconds
+Validation: Inverse RMSE: 0.19907
+Training Iteration 0019: Inverse RMSE: 0.39402, Took 12.708944 seconds
+Validation: Inverse RMSE: 0.18638
+Training Iteration 0020: Inverse RMSE: 0.38736, Took 12.399892 seconds
+Validation: Inverse RMSE: 0.18213
+Training Iteration 0021: Inverse RMSE: 0.38832, Took 13.000561 seconds
+Validation: Inverse RMSE: 0.17750
+Training Iteration 0022: Inverse RMSE: 0.38648, Took 12.386943 seconds
+Validation: Inverse RMSE: 0.20146
+Training Iteration 0023: Inverse RMSE: 0.38813, Took 12.525637 seconds
+Validation: Inverse RMSE: 0.17648
+Training Iteration 0024: Inverse RMSE: 0.38886, Took 12.775627 seconds
+Validation: Inverse RMSE: 0.18454
+Training Iteration 0025: Inverse RMSE: 0.38894, Took 12.623839 seconds
+Validation: Inverse RMSE: 0.16845
+Training Iteration 0026: Inverse RMSE: 0.38701, Took 12.760283 seconds
+Validation: Inverse RMSE: 0.19140
+Training Iteration 0027: Inverse RMSE: 0.39149, Took 12.490322 seconds
+Validation: Inverse RMSE: 0.20841
+Training Iteration 0028: Inverse RMSE: 0.39519, Took 12.595726 seconds
+Validation: Inverse RMSE: 0.16885
+Training Iteration 0029: Inverse RMSE: 0.38737, Took 12.307310 seconds
+Validation: Inverse RMSE: 0.18137
+Training Iteration 0030: Inverse RMSE: 0.39136, Took 12.750817 seconds
+Validation: Inverse RMSE: 0.17877
+Training Iteration 0031: Inverse RMSE: 0.38759, Took 12.788089 seconds
+Validation: Inverse RMSE: 0.17876
+Training Iteration 0032: Inverse RMSE: 0.38637, Took 12.651436 seconds
+Validation: Inverse RMSE: 0.16963
+Training Iteration 0033: Inverse RMSE: 0.38438, Took 12.614347 seconds
+Validation: Inverse RMSE: 0.18476
+Training Iteration 0034: Inverse RMSE: 0.38540, Took 12.375189 seconds
+Validation: Inverse RMSE: 0.18846
+Training Iteration 0035: Inverse RMSE: 0.38649, Took 12.756198 seconds
+Validation: Inverse RMSE: 0.16468
+Training Iteration 0036: Inverse RMSE: 0.38381, Took 12.444092 seconds
+Validation: Inverse RMSE: 0.17392
+Training Iteration 0037: Inverse RMSE: 0.38800, Took 12.451921 seconds
+Validation: Inverse RMSE: 0.16894
+Training Iteration 0038: Inverse RMSE: 0.39265, Took 12.491057 seconds
+Validation: Inverse RMSE: 0.18206
+Training Iteration 0039: Inverse RMSE: 0.38725, Took 12.624276 seconds
+Validation: Inverse RMSE: 0.17811
+Training Iteration 0040: Inverse RMSE: 0.38937, Took 12.659337 seconds
+Validation: Inverse RMSE: 0.22763
+Training Iteration 0041: Inverse RMSE: 0.39091, Took 12.550044 seconds
+Validation: Inverse RMSE: 0.16016
+Training Iteration 0042: Inverse RMSE: 0.38600, Took 12.738397 seconds
+Validation: Inverse RMSE: 0.17112
+Training Iteration 0043: Inverse RMSE: 0.38747, Took 12.704339 seconds
+Validation: Inverse RMSE: 0.17958
+Training Iteration 0044: Inverse RMSE: 0.38651, Took 12.539615 seconds
+Validation: Inverse RMSE: 0.16269
+Training Iteration 0045: Inverse RMSE: 0.38661, Took 12.668200 seconds
+Validation: Inverse RMSE: 0.19264
+Training Iteration 0046: Inverse RMSE: 0.38585, Took 12.480053 seconds
+Validation: Inverse RMSE: 0.20640
+Training Iteration 0047: Inverse RMSE: 0.38652, Took 12.366688 seconds
+Validation: Inverse RMSE: 0.18039
+Training Iteration 0048: Inverse RMSE: 0.38674, Took 12.541225 seconds
+Validation: Inverse RMSE: 0.18475
+Training Iteration 0049: Inverse RMSE: 0.38478, Took 12.755167 seconds
+Validation: Inverse RMSE: 0.17564
+Training Iteration 0050: Inverse RMSE: 0.38380, Took 12.460145 seconds
+Validation: Inverse RMSE: 0.18207
+Training Iteration 0051: Inverse RMSE: 0.38513, Took 12.635519 seconds
+Validation: Inverse RMSE: 0.17240
+Training Iteration 0052: Inverse RMSE: 0.38283, Took 12.578912 seconds
+Validation: Inverse RMSE: 0.17768
+Training Iteration 0053: Inverse RMSE: 0.38220, Took 12.610199 seconds
+Validation: Inverse RMSE: 0.18251
+Training Iteration 0054: Inverse RMSE: 0.38177, Took 12.675362 seconds
+Validation: Inverse RMSE: 0.16540
+Training Iteration 0055: Inverse RMSE: 0.38795, Took 12.595769 seconds
+Validation: Inverse RMSE: 0.17333
+Training Iteration 0056: Inverse RMSE: 0.38664, Took 12.805474 seconds
+Validation: Inverse RMSE: 0.16613
+Training Iteration 0057: Inverse RMSE: 0.38412, Took 12.463948 seconds
+Validation: Inverse RMSE: 0.17754
+Training Iteration 0058: Inverse RMSE: 0.38576, Took 12.773256 seconds
+Validation: Inverse RMSE: 0.16218
+Training Iteration 0059: Inverse RMSE: 0.38468, Took 12.566812 seconds
+Validation: Inverse RMSE: 0.17522
+Training Iteration 0060: Inverse RMSE: 0.38412, Took 12.848830 seconds
+Validation: Inverse RMSE: 0.17418
+Training Iteration 0061: Inverse RMSE: 0.38259, Took 12.635555 seconds
+Validation: Inverse RMSE: 0.18625
+Training Iteration 0062: Inverse RMSE: 0.38164, Took 12.570308 seconds
+Validation: Inverse RMSE: 0.16839
+Training Iteration 0063: Inverse RMSE: 0.38336, Took 12.502154 seconds
+Validation: Inverse RMSE: 0.17304
+Training Iteration 0064: Inverse RMSE: 0.38271, Took 12.413579 seconds
+Validation: Inverse RMSE: 0.17742
+Training Iteration 0065: Inverse RMSE: 0.38502, Took 12.562371 seconds
+Validation: Inverse RMSE: 0.17857
+Training Iteration 0066: Inverse RMSE: 0.38185, Took 12.444189 seconds
+Validation: Inverse RMSE: 0.16482
+Training Iteration 0067: Inverse RMSE: 0.38879, Took 12.523870 seconds
+Validation: Inverse RMSE: 0.18036
+Training Iteration 0068: Inverse RMSE: 0.38399, Took 12.406912 seconds
+Validation: Inverse RMSE: 0.18591
+Training Iteration 0069: Inverse RMSE: 0.38480, Took 12.618069 seconds
+Validation: Inverse RMSE: 0.16387
+Training Iteration 0070: Inverse RMSE: 0.38146, Took 12.577812 seconds
+Validation: Inverse RMSE: 0.17981
+Training Iteration 0071: Inverse RMSE: 0.38146, Took 12.322359 seconds
+Validation: Inverse RMSE: 0.16946
+Training Iteration 0072: Inverse RMSE: 0.38520, Took 12.553894 seconds
+Validation: Inverse RMSE: 0.17221
+Training Iteration 0073: Inverse RMSE: 0.38208, Took 12.507781 seconds
+Validation: Inverse RMSE: 0.17595
+Training Iteration 0074: Inverse RMSE: 0.38287, Took 12.927390 seconds
+Validation: Inverse RMSE: 0.17217
+Training Iteration 0075: Inverse RMSE: 0.38615, Took 12.427014 seconds
+Validation: Inverse RMSE: 0.16861
+Training Iteration 0076: Inverse RMSE: 0.38866, Took 12.511186 seconds
+Validation: Inverse RMSE: 0.15284
+Training Iteration 0077: Inverse RMSE: 0.38320, Took 12.457273 seconds
+Validation: Inverse RMSE: 0.17941
+Training Iteration 0078: Inverse RMSE: 0.38275, Took 12.571232 seconds
+Validation: Inverse RMSE: 0.18559
+Training Iteration 0079: Inverse RMSE: 0.38346, Took 12.781685 seconds
+Validation: Inverse RMSE: 0.17667
+Training Iteration 0080: Inverse RMSE: 0.38061, Took 12.681894 seconds
+Validation: Inverse RMSE: 0.17199
+Training Iteration 0081: Inverse RMSE: 0.38154, Took 12.783988 seconds
+Validation: Inverse RMSE: 0.16675
+Training Iteration 0082: Inverse RMSE: 0.38379, Took 12.661062 seconds
+Validation: Inverse RMSE: 0.17422
+Training Iteration 0083: Inverse RMSE: 0.38116, Took 12.438926 seconds
